@@ -2,14 +2,14 @@ const connection = require('./connection');
 
 // Função para buscar todos os prédios
 const getAllPredios = async () => {
-  const [predios] = await connection.execute('SELECT * FROM predio');
+  const [predios] = await connection.execute('SELECT * FROM predios');
   return predios;
 };
 
 // Função para criar um novo prédio
 const createPredio = async (predio) => {
   const { nome } = predio;
-  const insertPredioQuery = 'INSERT INTO predio (nome) VALUES (?)';
+  const insertPredioQuery = 'INSERT INTO predios (nome) VALUES (?)';
   const values = [nome];
 
   try {
@@ -23,7 +23,7 @@ const createPredio = async (predio) => {
 
 // Função para buscar um prédio pelo ID
 const getPredioById = async (id) => {
-  const query = 'SELECT * FROM predio WHERE id = ?';
+  const query = 'SELECT * FROM predios WHERE id = ?';
   const [predios] = await connection.execute(query, [id]);
 
   if (predios.length > 0) {
@@ -37,7 +37,7 @@ const getPredioById = async (id) => {
 const updatePredio = async (predio) => {
   const { id, nome } = predio;
   const updatePredioQuery = `
-    UPDATE predio 
+    UPDATE predios 
     SET nome = ?
     WHERE id = ?
   `;
@@ -54,7 +54,7 @@ const updatePredio = async (predio) => {
 
 // Função para deletar um prédio pelo ID
 const deletePredio = async (id) => {
-  const deletePredioQuery = 'DELETE FROM predio WHERE id = ?';
+  const deletePredioQuery = 'DELETE FROM predios WHERE id = ?';
 
   try {
     const [result] = await connection.execute(deletePredioQuery, [id]);

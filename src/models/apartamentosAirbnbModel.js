@@ -6,20 +6,207 @@ const getAllApartamentos = async () => {
   return apartamentos;
 };
 
-// Função para criar um novo apartamento
+// Função para criar um novo apartamento com valores opcionais
 const createApartamento = async (apartamento) => {
-  const { nome, predio_id, link_airbnb_calendario } = apartamento;
+  const {
+    nome = null,
+    predio_id = null,
+    link_airbnb_calendario = null,
+    nome_anuncio = null,
+    endereco = null,
+    bairro = null,
+    proprietario_id = null,
+    senha_porta = null,
+    data_troca = null,
+    totem = null,
+    adesivo_aviso = null,
+    andar = null,
+    numero_hospedes = null,
+    porcentagem_cobrada = null,
+    valor_enxoval = null,
+    valor_limpeza = null,
+    qtd_cama_solteiro = null,
+    qtd_cama_casal = null,
+    qtd_sofa_cama = null,
+    aceita_pet = null,
+    tipo_checkin = null,
+    acesso_predio = null,
+    link_app = null,
+    acesso_porta = null,
+    secador_cabelo = null,
+    cafeteira = null,
+    ventilador = null,
+    ferro_passar = null,
+    sanduicheira = null,
+    chaleira_eletrica = null,
+    liquidificador = null,
+    smart_tv = null,
+    tv_aberta = null,
+    tipo_chuveiro = null,
+    escritorio = null,
+    tv_quarto = null,
+    ar_condicionado = null,
+    aspirador_de_po = null,
+    qtd_taca_vinho = null,
+    tipo_fogao = null,
+    respostas_programadas = null,
+    ssid_wifi = null,
+    senha_wifi = null
+  } = apartamento;
+
   const insertApartamentoQuery = `
-    INSERT INTO apartamentos (nome, predio_id, link_airbnb_calendario) 
-    VALUES (?, ?, ?)
+    INSERT INTO apartamentos (
+      nome, predio_id, link_airbnb_calendario, nome_anuncio, endereco, bairro,
+      proprietario_id, senha_porta, data_troca, totem, adesivo_aviso, andar,
+      numero_hospedes, porcentagem_cobrada, valor_enxoval, valor_limpeza,
+      qtd_cama_solteiro, qtd_cama_casal, qtd_sofa_cama, aceita_pet, tipo_checkin,
+      acesso_predio, link_app, acesso_porta, secador_cabelo, cafeteira,
+      ventilador, ferro_passar, sanduicheira, chaleira_eletrica, liquidificador,
+      smart_tv, tv_aberta, tipo_chuveiro, escritorio, tv_quarto, ar_condicionado,
+      aspirador_de_po, qtd_taca_vinho, tipo_fogao, respostas_programadas,
+      ssid_wifi, senha_wifi
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )
   `;
-  const values = [nome, predio_id, link_airbnb_calendario];
+
+  const values = [
+    nome, predio_id, link_airbnb_calendario, nome_anuncio, endereco, bairro,
+    proprietario_id, senha_porta, data_troca, totem, adesivo_aviso, andar,
+    numero_hospedes, porcentagem_cobrada, valor_enxoval, valor_limpeza,
+    qtd_cama_solteiro, qtd_cama_casal, qtd_sofa_cama, aceita_pet, tipo_checkin,
+    acesso_predio, link_app, acesso_porta, secador_cabelo, cafeteira,
+    ventilador, ferro_passar, sanduicheira, chaleira_eletrica, liquidificador,
+    smart_tv, tv_aberta, tipo_chuveiro, escritorio, tv_quarto, ar_condicionado,
+    aspirador_de_po, qtd_taca_vinho, tipo_fogao, respostas_programadas,
+    ssid_wifi, senha_wifi
+  ];
 
   try {
     const [result] = await connection.execute(insertApartamentoQuery, values);
     return { insertId: result.insertId };
   } catch (error) {
     console.error('Erro ao inserir apartamento:', error);
+    throw error;
+  }
+};
+
+// Função para atualizar um apartamento com valores opcionais
+const updateApartamento = async (apartamento) => {
+  const {
+    id,
+    nome = null,
+    predio_id = null,
+    link_airbnb_calendario = null,
+    nome_anuncio = null,
+    endereco = null,
+    bairro = null,
+    proprietario_id = null,
+    senha_porta = null,
+    data_troca = null,
+    totem = null,
+    adesivo_aviso = null,
+    andar = null,
+    numero_hospedes = null,
+    porcentagem_cobrada = null,
+    valor_enxoval = null,
+    valor_limpeza = null,
+    qtd_cama_solteiro = null,
+    qtd_cama_casal = null,
+    qtd_sofa_cama = null,
+    aceita_pet = null,
+    tipo_checkin = null,
+    acesso_predio = null,
+    link_app = null,
+    acesso_porta = null,
+    secador_cabelo = null,
+    cafeteira = null,
+    ventilador = null,
+    ferro_passar = null,
+    sanduicheira = null,
+    chaleira_eletrica = null,
+    liquidificador = null,
+    smart_tv = null,
+    tv_aberta = null,
+    tipo_chuveiro = null,
+    escritorio = null,
+    tv_quarto = null,
+    ar_condicionado = null,
+    aspirador_de_po = null,
+    qtd_taca_vinho = null,
+    tipo_fogao = null,
+    respostas_programadas = null,
+    ssid_wifi = null,
+    senha_wifi = null
+  } = apartamento;
+
+  const updateApartamentoQuery = `
+    UPDATE apartamentos SET
+      nome = ?,
+      predio_id = ?,
+      link_airbnb_calendario = ?,
+      nome_anuncio = ?,
+      endereco = ?,
+      bairro = ?,
+      proprietario_id = ?,
+      senha_porta = ?,
+      data_troca = ?,
+      totem = ?,
+      adesivo_aviso = ?,
+      andar = ?,
+      numero_hospedes = ?,
+      porcentagem_cobrada = ?,
+      valor_enxoval = ?,
+      valor_limpeza = ?,
+      qtd_cama_solteiro = ?,
+      qtd_cama_casal = ?,
+      qtd_sofa_cama = ?,
+      aceita_pet = ?,
+      tipo_checkin = ?,
+      acesso_predio = ?,
+      link_app = ?,
+      acesso_porta = ?,
+      secador_cabelo = ?,
+      cafeteira = ?,
+      ventilador = ?,
+      ferro_passar = ?,
+      sanduicheira = ?,
+      chaleira_eletrica = ?,
+      liquidificador = ?,
+      smart_tv = ?,
+      tv_aberta = ?,
+      tipo_chuveiro = ?,
+      escritorio = ?,
+      tv_quarto = ?,
+      ar_condicionado = ?,
+      aspirador_de_po = ?,
+      qtd_taca_vinho = ?,
+      tipo_fogao = ?,
+      respostas_programadas = ?,
+      ssid_wifi = ?,
+      senha_wifi = ?
+    WHERE id = ?
+  `;
+
+  const values = [
+    nome, predio_id, link_airbnb_calendario, nome_anuncio, endereco, bairro,
+    proprietario_id, senha_porta, data_troca, totem, adesivo_aviso, andar,
+    numero_hospedes, porcentagem_cobrada, valor_enxoval, valor_limpeza,
+    qtd_cama_solteiro, qtd_cama_casal, qtd_sofa_cama, aceita_pet, tipo_checkin,
+    acesso_predio, link_app, acesso_porta, secador_cabelo, cafeteira,
+    ventilador, ferro_passar, sanduicheira, chaleira_eletrica, liquidificador,
+    smart_tv, tv_aberta, tipo_chuveiro, escritorio, tv_quarto, ar_condicionado,
+    aspirador_de_po, qtd_taca_vinho, tipo_fogao, respostas_programadas,
+    ssid_wifi, senha_wifi,
+    id
+  ];
+
+  try {
+    const [result] = await connection.execute(updateApartamentoQuery, values);
+    return result.affectedRows > 0;
+  } catch (error) {
+    console.error('Erro ao atualizar apartamento:', error);
     throw error;
   }
 };
@@ -41,25 +228,6 @@ const getApartamentosByPredioId = async (predioId) => {
   const query = 'SELECT * FROM apartamentos WHERE predio_id = ?';
   const [apartamentos] = await connection.execute(query, [predioId]);
   return apartamentos;
-};
-
-// Função para atualizar um apartamento
-const updateApartamento = async (apartamento) => {
-  const { id, nome, predio_id, link_airbnb_calendario } = apartamento;
-  const updateApartamentoQuery = `
-    UPDATE apartamentos 
-    SET nome = ?, predio_id = ?, link_airbnb_calendario = ?
-    WHERE id = ?
-  `;
-  const values = [nome, predio_id, link_airbnb_calendario, id];
-
-  try {
-    const [result] = await connection.execute(updateApartamentoQuery, values);
-    return result.affectedRows > 0; // Retorna true se o apartamento foi atualizado com sucesso
-  } catch (error) {
-    console.error('Erro ao atualizar apartamento:', error);
-    throw error;
-  }
 };
 
 // Função para deletar um apartamento pelo ID

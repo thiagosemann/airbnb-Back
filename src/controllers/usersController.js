@@ -68,18 +68,7 @@ const updateUser = async (request, response) => {
   }
 };
 
-const getUsersByBuilding = async (request, response) => {
-  try {
-    const { building_id } = request.params;
-    const users = await usersModel.getUsersByBuilding(building_id);
 
-      return response.status(200).json(users);
-    
-  } catch (error) {
-    console.error('Erro ao obter usuários pelo building_id:', error);
-    return response.status(500).json({ error: 'Erro ao obter usuários' });
-  }
-};
 const deleteUser = async (request, response) => {
   try {
     const { id } = request.params;
@@ -110,7 +99,6 @@ module.exports = {
   loginUser,
   getUser,
   updateUser,
-  getUsersByBuilding,
   deleteUser,
   createUsersBatch
 };

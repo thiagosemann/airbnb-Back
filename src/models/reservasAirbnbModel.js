@@ -30,6 +30,7 @@ const createReserva = async (reserva) => {
 
   try {
     const [result] = await connection.execute(insertReservaQuery, values);
+
     return { insertId: result.insertId };
   } catch (error) {
     console.error('Erro ao inserir reserva:', error);
@@ -41,7 +42,6 @@ const syncAirbnbReservations = async () => {
   try {
     const apartamentos = await apartamentosModel.getAllApartamentos();
     const apartmentsComLinks = apartamentos.filter(a => a.link_airbnb_calendario);
-
     // Calcula a data limite (hoje + 3 meses)
     const dataLimite = new Date();
     dataLimite.setMonth(dataLimite.getMonth() + 3);
@@ -152,15 +152,45 @@ const getReservasByApartamentoId = async (apartamentoId) => {
   return reservas;
 };
 
-// Função para atualizar uma reserva
 const updateReserva = async (reserva) => {
-  const {id, apartamento_id, description, end_data, start_date, Observacoes, cod_reserva, link_reserva,form_answered, credencial_made, informed  } = reserva;
+  const {
+    id,
+    apartamento_id,
+    description,
+    end_data,
+    start_date,
+    Observacoes,
+    cod_reserva,
+    link_reserva,
+    form_answered,
+    credencial_made,
+    informed,
+    check_in,
+    check_out,
+  } = reserva;
+
   const updateReservaQuery = `
     UPDATE reservas 
-    SET apartamento_id = ?, description = ?, end_data = ?, start_date = ?, Observacoes = ?,cod_reserva  = ?, link_reserva  = ?,form_answered  = ?, credencial_made  = ?, informed = ?,check_in = ?,check_out = ?
+    SET apartamento_id = ?, description = ?, end_data = ?, start_date = ?, Observacoes = ?, cod_reserva = ?, link_reserva = ?, form_answered = ?, credencial_made = ?, informed = ?, check_in = ?, check_out = ?
     WHERE id = ?
   `;
-  const values = [apartamento_id, description, end_data, start_date, Observacoes,cod_reserva, link_reserva,form_answered, credencial_made, informed , id];
+
+  // Certifique-se de que todos os valores estejam na ordem correta
+  const values = [
+    apartamento_id,
+    description,
+    end_data,
+    start_date,
+    Observacoes,
+    cod_reserva,
+    link_reserva,
+    form_answered,
+    credencial_made,
+    informed,
+    check_in,
+    check_out,
+    id, // O ID deve ser o último valor, pois corresponde ao WHERE id = ?
+  ];
 
   try {
     const [result] = await connection.execute(updateReservaQuery, values);

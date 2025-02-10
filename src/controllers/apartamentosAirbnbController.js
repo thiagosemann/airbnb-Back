@@ -82,6 +82,7 @@ const deleteApartamento = async (request, response) => {
   }
 };
 
+
 module.exports = {
   getAllApartamentos,
   createApartamento,
