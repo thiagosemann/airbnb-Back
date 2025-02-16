@@ -178,6 +178,24 @@ const syncAirbnbReservations = async () => {
   }
 };
 
+// Função de sincronização automática
+const startAutoSync = () => {
+  // Executa imediatamente
+  syncAirbnbReservations().catch(error => {
+    console.error('Erro na sincronização inicial:', error.message);
+  });
+
+  // Configura o intervalo de 5 minutos (300000 ms)
+  setInterval(() => {
+    syncAirbnbReservations().catch(error => {
+      console.error('Erro na sincronização periódica:', error.message);
+    });
+  }, 300000); 
+};
+
+// Inicia o processo
+startAutoSync();
+
 // Função para buscar uma reserva pelo ID
 const getReservaById = async (id) => {
   const query = 'SELECT * FROM reservas WHERE id = ?';
