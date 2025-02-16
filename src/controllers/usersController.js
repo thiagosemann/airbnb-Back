@@ -37,7 +37,7 @@ const loginUser = async (request, response) => {
     return response.status(500).json({ error: 'Erro ao realizar login' });
   }
 };
-
+ 
 const getUser = async (request, response) => {
   try {
     const { id } = request.params;
