@@ -29,6 +29,7 @@
     "moment-timezone": "^0.5.47",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.3.1",
+    "nvm": "^0.0.4",
     "ws": "^8.13.0"
   },
   "devDependencies": {

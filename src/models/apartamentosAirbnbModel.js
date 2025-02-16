@@ -51,7 +51,10 @@ const createApartamento = async (apartamento) => {
     tipo_fogao = null,
     respostas_programadas = null,
     ssid_wifi = null,
-    senha_wifi = null
+    senha_wifi = null,
+    user_prioridade1 = null,
+    user_prioridade2 = null,
+    user_prioridade3 = null
   } = apartamento;
 
   const insertApartamentoQuery = `
@@ -64,10 +67,10 @@ const createApartamento = async (apartamento) => {
       ventilador, ferro_passar, sanduicheira, chaleira_eletrica, liquidificador,
       smart_tv, tv_aberta, tipo_chuveiro, escritorio, tv_quarto, ar_condicionado,
       aspirador_de_po, qtd_taca_vinho, tipo_fogao, respostas_programadas,
-      ssid_wifi, senha_wifi
+      ssid_wifi, senha_wifi, user_prioridade1, user_prioridade2, user_prioridade3
     ) VALUES (
       ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )
   `;
 
@@ -80,7 +83,7 @@ const createApartamento = async (apartamento) => {
     ventilador, ferro_passar, sanduicheira, chaleira_eletrica, liquidificador,
     smart_tv, tv_aberta, tipo_chuveiro, escritorio, tv_quarto, ar_condicionado,
     aspirador_de_po, qtd_taca_vinho, tipo_fogao, respostas_programadas,
-    ssid_wifi, senha_wifi
+    ssid_wifi, senha_wifi, user_prioridade1, user_prioridade2, user_prioridade3
   ];
 
   try {
@@ -138,54 +141,23 @@ const updateApartamento = async (apartamento) => {
     tipo_fogao = null,
     respostas_programadas = null,
     ssid_wifi = null,
-    senha_wifi = null
+    senha_wifi = null,
+    user_prioridade1 = null,
+    user_prioridade2 = null,
+    user_prioridade3 = null
   } = apartamento;
 
   const updateApartamentoQuery = `
     UPDATE apartamentos SET
-      nome = ?,
-      predio_id = ?,
-      link_airbnb_calendario = ?,
-      nome_anuncio = ?,
-      endereco = ?,
-      bairro = ?,
-      proprietario_id = ?,
-      senha_porta = ?,
-      data_troca = ?,
-      totem = ?,
-      adesivo_aviso = ?,
-      andar = ?,
-      numero_hospedes = ?,
-      porcentagem_cobrada = ?,
-      valor_enxoval = ?,
-      valor_limpeza = ?,
-      qtd_cama_solteiro = ?,
-      qtd_cama_casal = ?,
-      qtd_sofa_cama = ?,
-      aceita_pet = ?,
-      tipo_checkin = ?,
-      acesso_predio = ?,
-      link_app = ?,
-      acesso_porta = ?,
-      secador_cabelo = ?,
-      cafeteira = ?,
-      ventilador = ?,
-      ferro_passar = ?,
-      sanduicheira = ?,
-      chaleira_eletrica = ?,
-      liquidificador = ?,
-      smart_tv = ?,
-      tv_aberta = ?,
-      tipo_chuveiro = ?,
-      escritorio = ?,
-      tv_quarto = ?,
-      ar_condicionado = ?,
-      aspirador_de_po = ?,
-      qtd_taca_vinho = ?,
-      tipo_fogao = ?,
-      respostas_programadas = ?,
-      ssid_wifi = ?,
-      senha_wifi = ?
+      nome = ?, predio_id = ?, link_airbnb_calendario = ?, nome_anuncio = ?, endereco = ?, bairro = ?,
+      proprietario_id = ?, senha_porta = ?, data_troca = ?, totem = ?, adesivo_aviso = ?, andar = ?,
+      numero_hospedes = ?, porcentagem_cobrada = ?, valor_enxoval = ?, valor_limpeza = ?,
+      qtd_cama_solteiro = ?, qtd_cama_casal = ?, qtd_sofa_cama = ?, aceita_pet = ?, tipo_checkin = ?,
+      acesso_predio = ?, link_app = ?, acesso_porta = ?, secador_cabelo = ?, cafeteira = ?,
+      ventilador = ?, ferro_passar = ?, sanduicheira = ?, chaleira_eletrica = ?, liquidificador = ?,
+      smart_tv = ?, tv_aberta = ?, tipo_chuveiro = ?, escritorio = ?, tv_quarto = ?, ar_condicionado = ?,
+      aspirador_de_po = ?, qtd_taca_vinho = ?, tipo_fogao = ?, respostas_programadas = ?,
+      ssid_wifi = ?, senha_wifi = ?, user_prioridade1 = ?, user_prioridade2 = ?, user_prioridade3 = ?
     WHERE id = ?
   `;
 
@@ -198,7 +170,7 @@ const updateApartamento = async (apartamento) => {
     ventilador, ferro_passar, sanduicheira, chaleira_eletrica, liquidificador,
     smart_tv, tv_aberta, tipo_chuveiro, escritorio, tv_quarto, ar_condicionado,
     aspirador_de_po, qtd_taca_vinho, tipo_fogao, respostas_programadas,
-    ssid_wifi, senha_wifi,
+    ssid_wifi, senha_wifi, user_prioridade1, user_prioridade2, user_prioridade3,
     id
   ];
 
@@ -210,7 +182,6 @@ const updateApartamento = async (apartamento) => {
     throw error;
   }
 };
-
 // Função para buscar um apartamento pelo ID
 const getApartamentoById = async (id) => {
   const query = 'SELECT * FROM apartamentos WHERE id = ?';

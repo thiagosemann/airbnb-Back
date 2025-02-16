@@ -4,7 +4,6 @@ const axios = require('axios');
 const ical = require('ical.js');
 const moment = require('moment-timezone');
 
-
 // Função para buscar todas as reservas com o nome do apartamento
 const getAllReservas = async () => {
   const query = `
@@ -17,20 +16,47 @@ const getAllReservas = async () => {
   return reservas;
 };
 
-
-// Função para criar reserva (atualizada com cod_reserva)
+// Função para criar reserva (atualizada com cod_reserva e faxina_userId)
 const createReserva = async (reserva) => {
-  const { apartamento_id, description, end_data, start_date, Observacoes, cod_reserva, link_reserva,form_answered, credencial_made, informed,check_in,check_out } = reserva;
+  const { 
+    apartamento_id, 
+    description, 
+    end_data, 
+    start_date, 
+    Observacoes, 
+    cod_reserva, 
+    link_reserva, 
+    limpeza_realizada, 
+    credencial_made, 
+    informed, 
+    check_in, 
+    check_out,
+    faxina_userId // Nova coluna
+  } = reserva;
+
   const insertReservaQuery = `
     INSERT INTO reservas 
-    (apartamento_id, description, end_data, start_date, Observacoes, cod_reserva, link_reserva,form_answered, credencial_made, informed,check_in,check_out) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (apartamento_id, description, end_data, start_date, Observacoes, cod_reserva, link_reserva, limpeza_realizada, credencial_made, informed, check_in, check_out, faxina_userId) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
-  const values = [apartamento_id, description, end_data, start_date, Observacoes, cod_reserva, link_reserva,form_answered, credencial_made, informed,check_in,check_out];
+  const values = [
+    apartamento_id, 
+    description, 
+    end_data, 
+    start_date, 
+    Observacoes, 
+    cod_reserva, 
+    link_reserva, 
+    limpeza_realizada, 
+    credencial_made, 
+    informed, 
+    check_in, 
+    check_out,
+    faxina_userId // Nova coluna
+  ];
 
   try {
     const [result] = await connection.execute(insertReservaQuery, values);
-
     return { insertId: result.insertId };
   } catch (error) {
     console.error('Erro ao inserir reserva:', error);
@@ -42,7 +68,6 @@ const syncAirbnbReservations = async () => {
   try {
     const apartamentos = await apartamentosModel.getAllApartamentos();
     const apartmentsComLinks = apartamentos.filter(a => a.link_airbnb_calendario);
-    // Calcula a data limite (hoje + 3 meses)
     const dataLimite = new Date();
     dataLimite.setMonth(dataLimite.getMonth() + 3);
 
@@ -52,6 +77,7 @@ const syncAirbnbReservations = async () => {
         const jcalData = new ical.parse(response.data);
         const comp = new ical.Component(jcalData);
         const vevents = comp.getAllSubcomponents('vevent');
+        const currentCodReservas = new Set(); // Armazena códigos atuais
 
         for (const vevent of vevents) {
           const event = {
@@ -62,44 +88,31 @@ const syncAirbnbReservations = async () => {
             uid: vevent.getFirstPropertyValue('uid'),
           };
 
-          // Verifica se a data de início do evento está dentro do período permitido (3 meses)
-          if (event.startDate > dataLimite) {
-            continue;
-          }
+          if (event.startDate > dataLimite) continue;
 
-          let cod_reserva;
-          let link_reserva;
-
+          // Geração do código e link (mantido igual)
+          let cod_reserva, link_reserva;
           if (event.description) {
             const codReservaMatch = event.description.match(/\/details\/([A-Z0-9]+)/);
             const linkMatch = event.description.match(/Reservation URL:\s*(https:\/\/www\.airbnb\.com\/hosting\/reservations\/details\/[A-Z0-9]+)/);
-            cod_reserva = codReservaMatch ? codReservaMatch[1] : null;
-            link_reserva = linkMatch ? linkMatch[1] : null;
+            cod_reserva = codReservaMatch?.[1];
+            link_reserva = linkMatch?.[1];
           } else {
-            // Formata a endDate e combina com o nome do apartamento
-            const formatDate = (date) => {
-              const day = String(date.getDate()).padStart(2, '0');
-              const month = String(date.getMonth() + 1).padStart(2, '0');
-              const year = date.getFullYear();
-              return `${day}-${month}-${year}`;
-            };
-
+            const formatDate = (date) => `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
             cod_reserva = `${apartamento.nome}/${formatDate(event.endDate)}`;
             link_reserva = "https://www.admforest.com.br/";
           }
 
-          if (!cod_reserva) {
-            console.log('Não foi possível gerar código de reserva:', event);
-            continue;
-          }
-          if (!link_reserva) {
-            console.log('Não foi possível gerar link de reserva:', event);
+          if (!cod_reserva || !link_reserva) {
+            console.log('Dados incompletos:', event);
             continue;
           }
 
-          // Verificação de existência
+          currentCodReservas.add(cod_reserva); // Adiciona código à lista atual
+
+          // Verifica existência e atualiza datas se necessário
           const [existing] = await connection.execute(
-            'SELECT id FROM reservas WHERE cod_reserva = ?',
+            'SELECT id, start_date, end_data FROM reservas WHERE cod_reserva = ?',
             [cod_reserva]
           );
 
@@ -108,18 +121,52 @@ const syncAirbnbReservations = async () => {
               apartamento_id: apartamento.id,
               description: event.summary,
               start_date: event.startDate,
-              end_data: event.endDate,
+              end_data: event.endDate, // Corrigido typo 'end_data'
               Observacoes: '',
               cod_reserva: cod_reserva,
               link_reserva: link_reserva,
-              form_answered:false,
-              credencial_made:false,
-              informed:false,
-              check_in:"15:00",
-              check_out:"11:00",
+              limpeza_realizada: false,
+              credencial_made: false,
+              informed: false,
+              check_in: "15:00",
+              check_out: "11:00",
+              faxina_userId: null // Nova coluna, valor padrão
             });
+          } else {
+            // Comparação de datas para atualização
+            const dbStart = existing[0].start_date;
+            const dbEnd = existing[0].end_data;
+            const shouldUpdate = dbStart.getTime() !== event.startDate.getTime() || 
+                                dbEnd.getTime() !== event.endDate.getTime();
+
+            if (shouldUpdate) {
+              await connection.execute(
+                'UPDATE reservas SET start_date = ?, end_data = ? WHERE id = ?',
+                [event.startDate, event.endDate, existing[0].id]
+              );
+            }
           }
         }
+
+        // Remove reservas canceladas (não presentes no calendário)
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        
+        if (currentCodReservas.size > 0) {
+          await connection.execute(
+            `DELETE FROM reservas 
+             WHERE apartamento_id = ? 
+             AND cod_reserva NOT IN (${Array.from(currentCodReservas).map(() => '?').join(',')}) 
+             AND start_date > ?`,
+            [apartamento.id, ...Array.from(currentCodReservas), hoje]
+          );
+        } else {
+          await connection.execute(
+            'DELETE FROM reservas WHERE apartamento_id = ? AND start_date > ?',
+            [apartamento.id, hoje]
+          );
+        }
+
       } catch (error) {
         console.error(`Erro no apartamento ${apartamento.id}:`, error.message);
       }
@@ -130,8 +177,6 @@ const syncAirbnbReservations = async () => {
     throw error;
   }
 };
-
-syncAirbnbReservations();
 
 // Função para buscar uma reserva pelo ID
 const getReservaById = async (id) => {
@@ -152,6 +197,7 @@ const getReservasByApartamentoId = async (apartamentoId) => {
   return reservas;
 };
 
+// Função para atualizar reserva (atualizada com faxina_userId)
 const updateReserva = async (reserva) => {
   const {
     id,
@@ -162,20 +208,20 @@ const updateReserva = async (reserva) => {
     Observacoes,
     cod_reserva,
     link_reserva,
-    form_answered,
+    limpeza_realizada,
     credencial_made,
     informed,
     check_in,
     check_out,
+    faxina_userId // Nova coluna
   } = reserva;
 
   const updateReservaQuery = `
     UPDATE reservas 
-    SET apartamento_id = ?, description = ?, end_data = ?, start_date = ?, Observacoes = ?, cod_reserva = ?, link_reserva = ?, form_answered = ?, credencial_made = ?, informed = ?, check_in = ?, check_out = ?
+    SET apartamento_id = ?, description = ?, end_data = ?, start_date = ?, Observacoes = ?, cod_reserva = ?, link_reserva = ?, limpeza_realizada = ?, credencial_made = ?, informed = ?, check_in = ?, check_out = ?, faxina_userId = ?
     WHERE id = ?
   `;
 
-  // Certifique-se de que todos os valores estejam na ordem correta
   const values = [
     apartamento_id,
     description,
@@ -184,11 +230,12 @@ const updateReserva = async (reserva) => {
     Observacoes,
     cod_reserva,
     link_reserva,
-    form_answered,
+    limpeza_realizada,
     credencial_made,
     informed,
     check_in,
     check_out,
+    faxina_userId, // Nova coluna
     id, // O ID deve ser o último valor, pois corresponde ao WHERE id = ?
   ];
 

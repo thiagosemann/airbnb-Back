@@ -12,6 +12,7 @@ const checkinFormController = require('./src/controllers/checkinFormController')
 // User routes
 router.get('/users', verifyToken, usersController.getAllUsers);
 router.get('/users/:id', verifyToken, usersController.getUser);
+router.get('/users/role/:role', verifyToken, usersController.getUsersByRole);
 router.post('/login', usersController.loginUser);
 router.post('/users', usersController.createUser);
 router.post('/users/batch', verifyToken, usersController.createUsersBatch);

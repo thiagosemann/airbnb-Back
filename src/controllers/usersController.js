@@ -19,16 +19,14 @@ const createUser = async (request, response) => {
     return response.status(409).json({ error: error.message });
   }
 };
- 
 
 const loginUser = async (request, response) => {
   try {
     const { email, password } = request.body;
 
-    const result = await usersModel.loginUser(email,password);
+    const result = await usersModel.loginUser(email, password);
     if (result) {
       // Autenticação bem-sucedida
-      // Retorna o token e o usuário
       return response.status(200).json({ user: result.user, token: result.token });
     } else {
       // Autenticação falhou
@@ -56,7 +54,6 @@ const getUser = async (request, response) => {
   }
 };
 
-
 const updateUser = async (request, response) => {
   try {
     const { id } = request.params;
@@ -67,7 +64,6 @@ const updateUser = async (request, response) => {
     return response.status(500).json({ error: 'Erro ao atualizar usuário' });
   }
 };
-
 
 const deleteUser = async (request, response) => {
   try {
@@ -83,6 +79,7 @@ const deleteUser = async (request, response) => {
     return response.status(500).json({ error: 'Erro ao excluir usuário.' });
   }
 };
+
 const createUsersBatch = async (request, response) => {
   try {
     const users = request.body; // Array de objetos com first_name, last_name, cpf, email
@@ -93,6 +90,18 @@ const createUsersBatch = async (request, response) => {
     return response.status(409).json({ error: error.message });
   }
 };
+
+const getUsersByRole = async (request, response) => {
+  try {
+    const { role } = request.params; // Obtém o papel (role) da URL
+    const users = await usersModel.getUsersByRole(role);
+    return response.status(200).json(users);
+  } catch (error) {
+    console.error('Erro ao obter usuários por papel:', error);
+    return response.status(500).json({ error: 'Erro ao obter usuários por papel' });
+  }
+};
+
 module.exports = {
   getAllUsers,
   createUser,
@@ -100,5 +109,6 @@ module.exports = {
   getUser,
   updateUser,
   deleteUser,
-  createUsersBatch
+  createUsersBatch,
+  getUsersByRole, 
 };

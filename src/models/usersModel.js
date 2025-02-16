@@ -220,6 +220,13 @@ const getUserByCPF = async (cpf) => {
   const [users] = await connection.execute(query, [cpf]);
   return users[0] || null;
 };
+const getUsersByRole = async (role) => {
+  const query = 'SELECT * FROM users WHERE role = ?';
+  const [users] = await connection.execute(query, [role]);
+  return users;
+};
+
+
 
 module.exports = {
   getAllUsers,
@@ -229,5 +236,6 @@ module.exports = {
   updateUser,
   deleteUser,
   createUsersBatch,
-  getUserByCPF
+  getUserByCPF,
+  getUsersByRole
 };
